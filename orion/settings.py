@@ -35,10 +35,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'comments',
-    # 'listings',
-    # 'orion',
-    # 'users'
+    'comments',
+    'board',
+    'chats',
+    'users'
 ]
 
 MIDDLEWARE = [
@@ -112,14 +112,18 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
+# маршруты необходимые для поиска статических файлов
 STATIC_URL = 'static/'
+
 STATICFILES_DIRS = [
-    BASE_DIR / 'static'
+    BASE_DIR / 'static',
 ]
 
-MEDIA_URL = 'media'
+# маршурыт необходимые для работы медиа файлов
+MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-# AUTH_USER_MODEL = 'users.CustomUser'
 
-# LOGIN_URL = 'users:login'
-# LOGOUT_REDIRECT_URL =
+AUTH_USER_MODEL = 'users.User'
+LOGIN_URL = 'users:login'
+
+LOGOUT_REDIRECT_URL = 'index'

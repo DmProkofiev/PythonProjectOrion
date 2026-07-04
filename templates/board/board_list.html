@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Объявления{% endblock %}
+
+{% block content %}
+<div class="container">
+        <div class="orion-board">
+            <h1>Orion</h1>
+            <p>Здесь найдётся всё, что вы ищете</p>
+        </div>
+    {% if not hide_filter %}
+    <div class="card p-3 mb-4">
+        <form method="get" class="form-container">
+            <div class="col-md-3">
+                <label for="search" class="form-label">Поиск</label>
+                <input type="search" id="search" name="q" value="{{ query }}"
+                       class="form-control" placeholder="Заголовок или описание...">
+            </div>
+
+            <div class="category-container">
+                <label for="category" class="form-label">Категория</label>
+                <select id="category" name="category" class="form-select">
+                    <option value="">Все</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="tag-container">
+                <label for="tag" class="form-label">Тег</label>
+                <select id="tag" name="tag" class="form-select">
+                    <option value="">Все</option>
+                    {% for tag in tags %}
+                        <option value="{{ tag.id }}" {% if selected_tag == tag.id|stringformat:"s" %}selected{% endif %}>
+                            {{ tag.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label for="sort" class="form-label">Сортировка</label>
+                <select id="sort" name="sort" class="form-select">
+                    <option value="-created_at" {% if selected_sort == '-created_at' %}selected{% endif %}>Сначала новые</option>
+                    <option value="created_at" {% if selected_sort == 'created_at' %}selected{% endif %}>Сначала старые</option>
+                    <option value="title" {% if selected_sort == 'title' %}selected{% endif %}>По заголовку (А-Я)</option>
+                    <option value="-title" {% if selected_sort == '-title' %}selected{% endif %}>По заголовку (Я-А)</option>
+                    <option value="-views" {% if selected_sort == '-views' %}selected{% endif %}>По просмотрам</option>
+                </select>
+            </div>
+
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1">Применить</button>
+                <a href="{% url 'index' %}" class="btn btn-secondary">Сбросить</a>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        {% for publication in publications %}
+            <div class="card">
+                {% if publication.image %}
+                    <img src="{{ publication.image.url }}" alt="{{ publication.title }}" class="card-img-top">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="" class="text-decoration-none">
+                            {{ publication.title }}
+                        </a>
+                    </h5>
+                    <p class="card-text">{{ publication.description|truncatewords:30 }}</p>
+                    <div class="card-category">
+                        <span class="label">Категория:</span>
+                        {% if publication.category %}
+                            <span class="badge bg-primary">{{ publication.category.name }}</span>
+                        {% else %}
+                            <span class="text-muted">Без категории</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-tags">
+                        <span class="label">Теги:</span>
+                        {% if publication.tags.all %}
+                            {% for tag in publication.tags.all %}
+                                <span class="badge bg-secondary">{{ tag.name }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-muted">Без тегов</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}">&laquo;</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">Назад</a>
+                </li>
+            {% endif %}
+
+            <li class="page-item disabled">
+                <span class="page-link">
+                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+                </span>
+            </li>
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}">Вперёд</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}">&raquo;</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
