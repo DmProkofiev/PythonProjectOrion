@@ -28,9 +28,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index_view, name="index"),
     path('users/', include('users.urls')),
-    path('board/', include('board.urls'))
-    # path('listings/', include('listings.urls')),
-    # path('comments/', include('comments.urls')),
+    path('board/', include('board.urls')),
+    path('comments/', include('comments.urls')),
 ]
 
 if settings.DEBUG:

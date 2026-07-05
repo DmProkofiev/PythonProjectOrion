@@ -69,7 +69,7 @@
                 {% endif %}
                 <div class="card-body">
                     <h5 class="card-title">
-                        <a href="" class="text-decoration-none">
+                        <a href="{% url 'board:detail' publication.slug %}" class="text-decoration-none">
                             {{ publication.title }}
                         </a>
                     </h5>

@@ -1,10 +1,106 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load static %}
 
-</body>
-</html>
+{% block title %}{{ publication.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        {% if publication.image %}
+            <img src="{{ publication.image.url }}" alt="{{ publication.title }}" class="card-img-top">
+        {% endif %}
+
+        <div class="card-body">
+            <h2 class="card-title">{{ publication.title }}</h2>
+
+            <div class="card-meta">
+                <span class="text-muted">
+                    Автор: {{ publication.author.username }}
+                </span>
+                <span class="text-muted">
+                    {{ publication.created_at|date:"d.m.Y H:i" }}
+                </span>
+                <span class="text-muted">
+                    Просмотров: {{ publication.views }}
+                </span>
+            </div>
+
+            <div class="card-price">
+                {{ publication.price }} ₽
+            </div>
+
+            <p class="card-text">{{ publication.description|linebreaks }}</p>
+
+            <div class="card-category">
+                <span class="label">Категория:</span>
+                {% if publication.category %}
+                    <span class="badge bg-primary">{{ publication.category.name }}</span>
+                {% else %}
+                    <span class="text-muted">Без категории</span>
+                {% endif %}
+            </div>
+
+            <div class="card-tags">
+                <span class="label">Теги:</span>
+                {% if publication.tags.all %}
+                    {% for tag in publication.tags.all %}
+                        <span class="badge bg-secondary">{{ tag.name }}</span>
+                    {% endfor %}
+                {% else %}
+                    <span class="text-muted">Без тегов</span>
+                {% endif %}
+            </div>
+
+            <div class="card-actions mt-4">
+                {% if user == publication.author %}
+                    <a href="{% url 'board:board_edite' publication.slug %}" class="btn btn-primary">Редактировать</a>
+                    <a href="{% url 'board:confirm_delete' publication.slug %}" class="btn btn-danger">Удалить</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+<div class="comments-section mt-5">
+    <h3>Комментарии ({{ comments.count }})</h3>
+
+    {% if user.is_authenticated %}
+        <form method="post" action="{% url 'comments:comment_add' publication.id %}" class="mb-4">
+            {% csrf_token %}
+            <div class="form-group">
+                <textarea name="text" class="form-control" rows="3" placeholder="Напишите комментарий..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Отправить</button>
+        </form>
+    {% else %}
+        <p class="text-muted"><a href="{% url 'users:login' %}">Войдите</a>, чтобы оставить комментарий.</p>
+    {% endif %}
+
+    {% for comment in comments %}
+        <div class="card p-3 mb-3">
+            <div class="d-flex align-center gap-2 mb-2">
+                {% if comment.author.avatar %}
+                    <img src="{{ comment.author.avatar.url }}" alt="{{ comment.author.username }}" class="avatar-header" style="width: 36px; height: 36px;">
+                {% else %}
+                    <div class="avatar-header" style="width: 36px; height: 36px; background: #2B6CB0; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; border-radius: 50%;">
+                        {{ comment.author.username|make_list|first|upper }}
+                    </div>
+                {% endif %}
+                <div>
+                    <strong>{{ comment.author.username }}</strong>
+                    <span class="text-muted" style="font-size: 13px; margin-left: 8px;">{{ comment.created_at|date:"d.m.Y H:i" }}</span>
+                </div>
+            </div>
+            <p class="card-text" style="margin-left: 46px;">{{ comment.text|linebreaks }}</p>
+            {% if user == comment.author or user.is_staff %}
+                <div style="margin-left: 46px;">
+                    <a href="{% url 'comments:comment_delete' comment.pk %}" class="text-danger" style="font-size: 13px;">Удалить</a>
+                </div>
+            {% endif %}
+        </div>
+    {% empty %}
+        <p class="text-muted">Комментарии отсутсвуют</p>
+    {% endfor %}
+</div>
+
+</div>
+{% endblock %}

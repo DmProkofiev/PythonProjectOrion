@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Удаление объявления{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card p-4">
+        <h2 class="mb-4">Удаление объявления</h2>
+        <p class="lead">Вы уверены, что хотите удалить объявление <strong>«{{ publication.title }}»</strong>?</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-danger">Удалить</button>
+                <a href="{% url 'board:detail' publication.slug %}" class="btn btn-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
